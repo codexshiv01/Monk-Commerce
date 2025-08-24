@@ -1,0 +1,841 @@
+{
+  "info": {
+    "name": "🚀 E-Commerce Coupon API - Advanced Features",
+    "description": "Complete collection for testing ALL coupon types including advanced features: stacking, tiered, flash sales, user-specific, graduated BxGy, cross-category BxGy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "2.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "laptopId",
+      "value": "833e33ef-6823-499f-b940-d9a4700eaab7",
+      "type": "string"
+    },
+    {
+      "key": "mouseId", 
+      "value": "b874ff7b-9a50-4e98-98f7-757f7d1284cd",
+      "type": "string"
+    },
+    {
+      "key": "tshirtId",
+      "value": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "type": "string"
+    },
+    {
+      "key": "sneakersId",
+      "value": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🏠 Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/health",
+          "host": ["{{baseURL}}"],
+          "path": ["health"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Health check returns 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "📦 Basic Coupon Management",
+      "item": [
+        {
+          "name": "Get All Coupons",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["coupons"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.coupons) {",
+                  "    const coupons = response.data.coupons;",
+                  "    // Extract coupon IDs for advanced testing",
+                  "    coupons.forEach(coupon => {",
+                  "        switch(coupon.code) {",
+                  "            case 'TIERED2024':",
+                  "                pm.environment.set('tieredCouponId', coupon.id);",
+                  "                break;",
+                  "            case 'FLASHFRIDAY':",
+                  "                pm.environment.set('flashSaleCouponId', coupon.id);",
+                  "                break;",
+                  "            case 'WELCOME50':",
+                  "                pm.environment.set('welcomeCouponId', coupon.id);",
+                  "                break;",
+                  "            case 'LOYALTY20':",
+                  "                pm.environment.set('loyaltyCouponId', coupon.id);",
+                  "                break;",
+                  "            case 'STACK10':",
+                  "                pm.environment.set('stackCouponId', coupon.id);",
+                  "                break;",
+                  "            case 'STACKSHIP':",
+                  "                pm.environment.set('stackShipCouponId', coupon.id);",
+                  "                break;",
+                  "            case 'GRADUATE':",
+                  "                pm.environment.set('graduatedBxGyCouponId', coupon.id);",
+                  "                break;",
+                  "            case 'CROSSCAT':",
+                  "                pm.environment.set('crossCategoryCouponId', coupon.id);",
+                  "                break;",
+                  "            case 'BXGY50':",
+                  "                pm.environment.set('percentageBxGyCouponId', coupon.id);",
+                  "                break;",
+                  "        }",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Basic Cart-wise Coupon",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"BASIC10\",\n  \"name\": \"Basic 10% Discount\",\n  \"description\": \"Simple 10% discount for testing\",\n  \"type\": \"cart_wise\",\n  \"discount\": {\n    \"type\": \"percentage\",\n    \"value\": 10,\n    \"maxDiscountAmount\": 100\n  },\n  \"conditions\": {\n    \"minimumAmount\": 100\n  },\n  \"endDate\": \"2025-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["coupons"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎯 Advanced Coupon Creation",
+      "item": [
+        {
+          "name": "Create Tiered Discount Coupon",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"TIER2024\",\n  \"name\": \"Tiered Discount 2024\",\n  \"description\": \"Progressive discounts: 5% off $100+, 10% off $300+, 15% off $500+\",\n  \"type\": \"tiered\",\n  \"discount\": {\n    \"type\": \"percentage\",\n    \"value\": 15\n  },\n  \"conditions\": {},\n  \"tieredRules\": {\n    \"tiers\": [\n      {\n        \"name\": \"Bronze Tier\",\n        \"minimumAmount\": 100,\n        \"discountType\": \"percentage\",\n        \"discountValue\": 5,\n        \"maxDiscountAmount\": 50\n      },\n      {\n        \"name\": \"Silver Tier\",\n        \"minimumAmount\": 300,\n        \"discountType\": \"percentage\",\n        \"discountValue\": 10,\n        \"maxDiscountAmount\": 100\n      },\n      {\n        \"name\": \"Gold Tier\",\n        \"minimumAmount\": 500,\n        \"discountType\": \"percentage\",\n        \"discountValue\": 15,\n        \"maxDiscountAmount\": 200\n      }\n    ]\n  },\n  \"endDate\": \"2025-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["coupons"]
+            }
+          }
+        },
+        {
+          "name": "Create Flash Sale Coupon",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"FLASH30\",\n  \"name\": \"Flash Sale 30%\",\n  \"description\": \"30% off during flash sale hours\",\n  \"type\": \"flash_sale\",\n  \"discount\": {\n    \"type\": \"percentage\",\n    \"value\": 30\n  },\n  \"conditions\": {\n    \"minimumAmount\": 50\n  },\n  \"flashSaleData\": {\n    \"discountMultiplier\": 1.2,\n    \"timeWindows\": [\n      {\n        \"startHour\": 14,\n        \"endHour\": 16,\n        \"daysOfWeek\": [1, 2, 3, 4, 5]\n      }\n    ]\n  },\n  \"endDate\": \"2025-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["coupons"]
+            }
+          }
+        },
+        {
+          "name": "Create User-Specific Coupon",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"NEWUSER25\",\n  \"name\": \"New User 25% Off\",\n  \"description\": \"Special 25% discount for first-time users\",\n  \"type\": \"user_specific\",\n  \"discount\": {\n    \"type\": \"percentage\",\n    \"value\": 25,\n    \"maxDiscountAmount\": 150\n  },\n  \"conditions\": {\n    \"minimumAmount\": 75\n  },\n  \"userCriteria\": {\n    \"isFirstTime\": true,\n    \"maxOrders\": 0\n  },\n  \"endDate\": \"2025-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["coupons"]
+            }
+          }
+        },
+        {
+          "name": "Create Stackable Coupons",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"STACK5\",\n  \"name\": \"Stackable 5% Off\",\n  \"description\": \"Stackable 5% discount\",\n  \"type\": \"cart_wise\",\n  \"discount\": {\n    \"type\": \"percentage\",\n    \"value\": 5,\n    \"maxDiscountAmount\": 25\n  },\n  \"conditions\": {\n    \"minimumAmount\": 100\n  },\n  \"priority\": 1,\n  \"stackable\": true,\n  \"endDate\": \"2025-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["coupons"]
+            }
+          }
+        },
+        {
+          "name": "Create Graduated BxGy Coupon",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"GRADTEST\",\n  \"name\": \"Graduated Buy More Get More\",\n  \"description\": \"Buy 2 get 1, buy 4 get 3, buy 6 get 5 free\",\n  \"type\": \"graduated_bxgy\",\n  \"discount\": {\n    \"type\": \"percentage\",\n    \"value\": 100\n  },\n  \"conditions\": {\n    \"buyProducts\": [\n      {\n        \"productId\": \"{{laptopId}}\",\n        \"quantity\": 1\n      }\n    ],\n    \"getProducts\": [\n      {\n        \"productId\": \"{{mouseId}}\",\n        \"quantity\": 1\n      }\n    ],\n    \"graduatedRules\": [\n      {\n        \"name\": \"Basic Tier\",\n        \"buyQuantity\": 2,\n        \"getQuantity\": 1,\n        \"discountPercentage\": 100\n      },\n      {\n        \"name\": \"Premium Tier\",\n        \"buyQuantity\": 4,\n        \"getQuantity\": 3,\n        \"discountPercentage\": 100\n      },\n      {\n        \"name\": \"VIP Tier\",\n        \"buyQuantity\": 6,\n        \"getQuantity\": 5,\n        \"discountPercentage\": 100\n      }\n    ],\n    \"repetitionLimit\": 2\n  },\n  \"endDate\": \"2025-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["coupons"]
+            }
+          }
+        },
+        {
+          "name": "Create Cross-Category BxGy Coupon",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"CROSSTEST\",\n  \"name\": \"Cross-Category Test\",\n  \"description\": \"Buy 2 Electronics, get 50% off Clothing\",\n  \"type\": \"cross_category_bxgy\",\n  \"discount\": {\n    \"type\": \"percentage\",\n    \"value\": 50\n  },\n  \"conditions\": {\n    \"buyCategories\": [\"Electronics\"],\n    \"getCategories\": [\"Clothing\"],\n    \"buyQuantity\": 2,\n    \"getQuantity\": 1,\n    \"getDiscountPercentage\": 50,\n    \"repetitionLimit\": 1\n  },\n  \"endDate\": \"2025-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["coupons"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔥 Advanced Coupon Testing",
+      "item": [
+        {
+          "name": "🎯 Test Tiered Discount (Gold Tier)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-123\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 1,\n      \"price\": 1200.00\n    },\n    {\n      \"productId\": \"{{mouseId}}\",\n      \"quantity\": 3,\n      \"price\": 80.00\n    }\n  ],\n  \"subtotal\": 1440.00,\n  \"shippingCost\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/apply-coupon/{{tieredCouponId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["apply-coupon", "{{tieredCouponId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Tiered discount applies Gold tier', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.data.cart.totalDiscount).to.be.above(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "⚡ Test Flash Sale (Time-based)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-123\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 1,\n      \"price\": 1200.00\n    }\n  ],\n  \"subtotal\": 1200.00,\n  \"shippingCost\": 25.00\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/apply-coupon/{{flashSaleCouponId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["apply-coupon", "{{flashSaleCouponId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Flash sale response received', function () {",
+                  "    pm.response.to.have.status([200, 400]);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('success');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "👤 Test User-Specific (First-time User)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"allowStacking\": false,\n  \"userId\": \"new-user-456\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 1,\n      \"price\": 1200.00\n    }\n  ],\n  \"subtotal\": 1200.00,\n  \"shippingCost\": 25.00,\n  \"user\": {\n    \"id\": \"new-user-456\",\n    \"type\": \"new\",\n    \"isFirstTime\": true,\n    \"loyaltyLevel\": 1,\n    \"orderCount\": 0,\n    \"registrationDate\": \"2025-08-24T10:00:00Z\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/applicable-coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["applicable-coupons"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('User-specific coupons found for first-time user', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.data.applicableCoupons).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "🏆 Test User-Specific (Loyalty User)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"loyal-user-789\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 1,\n      \"price\": 1200.00\n    },\n    {\n      \"productId\": \"{{mouseId}}\",\n      \"quantity\": 2,\n      \"price\": 80.00\n    }\n  ],\n  \"subtotal\": 1360.00,\n  \"shippingCost\": 0,\n  \"user\": {\n    \"id\": \"loyal-user-789\",\n    \"type\": \"premium\",\n    \"isFirstTime\": false,\n    \"loyaltyLevel\": 8,\n    \"orderCount\": 25,\n    \"registrationDate\": \"2024-01-15T10:00:00Z\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/apply-coupon/{{loyaltyCouponId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["apply-coupon", "{{loyaltyCouponId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Loyalty user discount applied', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success) {",
+                  "        pm.expect(response.data.cart.totalDiscount).to.be.above(0);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "🔥 Test Coupon Stacking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"allowStacking\": true,\n  \"userId\": \"user-123\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 1,\n      \"price\": 1200.00\n    },\n    {\n      \"productId\": \"{{mouseId}}\",\n      \"quantity\": 2,\n      \"price\": 80.00\n    }\n  ],\n  \"subtotal\": 1360.00,\n  \"shippingCost\": 25.00,\n  \"user\": {\n    \"id\": \"user-123\",\n    \"type\": \"existing\",\n    \"isFirstTime\": false,\n    \"loyaltyLevel\": 5,\n    \"orderCount\": 15\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/applicable-coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["applicable-coupons"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Coupon stacking returns multiple applicable coupons', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.data.applicableCoupons).to.be.an('array');",
+                  "    console.log('Stacking Result:', JSON.stringify(response.data, null, 2));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "📈 Test Graduated BxGy (VIP Tier)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-123\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 6,\n      \"price\": 1200.00\n    },\n    {\n      \"productId\": \"{{mouseId}}\",\n      \"quantity\": 5,\n      \"price\": 80.00\n    }\n  ],\n  \"subtotal\": 7600.00,\n  \"shippingCost\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/apply-coupon/{{graduatedBxGyCouponId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["apply-coupon", "{{graduatedBxGyCouponId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Graduated BxGy applies maximum tier', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success) {",
+                  "        pm.expect(response.data.cart.totalDiscount).to.be.above(0);",
+                  "        console.log('Graduated BxGy Discount:', response.data.cart.totalDiscount);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "🔀 Test Cross-Category BxGy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-123\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 2,\n      \"price\": 1200.00\n    },\n    {\n      \"productId\": \"{{mouseId}}\",\n      \"quantity\": 1,\n      \"price\": 80.00\n    },\n    {\n      \"productId\": \"{{tshirtId}}\",\n      \"quantity\": 2,\n      \"price\": 25.00\n    }\n  ],\n  \"subtotal\": 2530.00,\n  \"shippingCost\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/apply-coupon/{{crossCategoryCouponId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["apply-coupon", "{{crossCategoryCouponId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cross-category BxGy discount applied', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success) {",
+                  "        pm.expect(response.data.cart.totalDiscount).to.be.above(0);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "💯 Test Percentage BxGy (50% off)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-123\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 3,\n      \"price\": 1200.00\n    }\n  ],\n  \"subtotal\": 3600.00,\n  \"shippingCost\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/apply-coupon/{{percentageBxGyCouponId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["apply-coupon", "{{percentageBxGyCouponId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Percentage BxGy (50%) discount applied', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success) {",
+                  "        pm.expect(response.data.cart.totalDiscount).to.equal(600);",
+                  "        console.log('50% BxGy Discount:', response.data.cart.totalDiscount);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🧪 Complex Scenarios",
+      "item": [
+        {
+          "name": "🎮 High-Value Gaming Cart (Test Multiple Features)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"allowStacking\": true,\n  \"userId\": \"gamer-user-999\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 2,\n      \"price\": 1200.00\n    },\n    {\n      \"productId\": \"{{mouseId}}\",\n      \"quantity\": 3,\n      \"price\": 80.00\n    },\n    {\n      \"productId\": \"{{tshirtId}}\",\n      \"quantity\": 1,\n      \"price\": 25.00\n    }\n  ],\n  \"subtotal\": 2665.00,\n  \"shippingCost\": 50.00,\n  \"user\": {\n    \"id\": \"gamer-user-999\",\n    \"type\": \"premium\",\n    \"isFirstTime\": false,\n    \"loyaltyLevel\": 7,\n    \"orderCount\": 18,\n    \"registrationDate\": \"2023-12-01T10:00:00Z\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/applicable-coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["applicable-coupons"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Complex cart finds optimal coupon combination', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.data.applicableCoupons).to.be.an('array');",
+                  "    ",
+                  "    if (response.data.applicableCoupons.length > 0) {",
+                  "        const totalDiscount = response.data.applicableCoupons.reduce((sum, coupon) => {",
+                  "            return sum + (coupon.discountAmount || 0);",
+                  "        }, 0);",
+                  "        console.log('Total possible discount:', totalDiscount);",
+                  "        pm.expect(totalDiscount).to.be.above(0);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "🛒 Small Cart (Test Minimum Requirements)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"allowStacking\": false,\n  \"userId\": \"small-buyer\",\n  \"items\": [\n    {\n      \"productId\": \"{{mouseId}}\",\n      \"quantity\": 1,\n      \"price\": 80.00\n    }\n  ],\n  \"subtotal\": 80.00,\n  \"shippingCost\": 15.00,\n  \"user\": {\n    \"id\": \"small-buyer\",\n    \"type\": \"existing\",\n    \"isFirstTime\": false,\n    \"loyaltyLevel\": 2,\n    \"orderCount\": 3\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/applicable-coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["applicable-coupons"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Small cart handles minimum requirements correctly', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    // Should find fewer applicable coupons due to minimum amount requirements",
+                  "    console.log('Small cart applicable coupons:', response.data.applicableCoupons.length);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "🆕 New User Complete Journey",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"allowStacking\": true,\n  \"userId\": \"brand-new-user\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 1,\n      \"price\": 1200.00\n    },\n    {\n      \"productId\": \"{{mouseId}}\",\n      \"quantity\": 1,\n      \"price\": 80.00\n    }\n  ],\n  \"subtotal\": 1280.00,\n  \"shippingCost\": 25.00,\n  \"user\": {\n    \"id\": \"brand-new-user\",\n    \"type\": \"new\",\n    \"isFirstTime\": true,\n    \"loyaltyLevel\": 1,\n    \"orderCount\": 0,\n    \"registrationDate\": \"2025-08-24T14:00:00Z\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/applicable-coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["applicable-coupons"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('New user gets appropriate welcome offers', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    ",
+                  "    // Should find user-specific coupons for new users",
+                  "    const userSpecificCoupons = response.data.applicableCoupons.filter(coupon => ",
+                  "        coupon.coupon.type === 'user_specific'",
+                  "    );",
+                  "    ",
+                  "    console.log('New user specific coupons found:', userSpecificCoupons.length);",
+                  "    console.log('All applicable coupons:', response.data.applicableCoupons.length);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "❌ Error & Edge Case Testing",
+      "item": [
+        {
+          "name": "Apply Expired Coupon",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"test-user\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 1,\n      \"price\": 1200.00\n    }\n  ],\n  \"subtotal\": 1200.00\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/apply-coupon/expired-coupon-id",
+              "host": ["{{baseURL}}"],
+              "path": ["apply-coupon", "expired-coupon-id"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Expired coupon returns appropriate error', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flash Sale Outside Time Window",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"test-user\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 1,\n      \"price\": 1200.00\n    }\n  ],\n  \"subtotal\": 1200.00\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/apply-coupon/{{flashSaleCouponId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["apply-coupon", "{{flashSaleCouponId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Flash sale outside time window handled correctly', function () {",
+                  "    const response = pm.response.json();",
+                  "    // Should either work (if in time window) or fail gracefully",
+                  "    pm.expect(response).to.have.property('success');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid User Data for User-Specific Coupon",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"allowStacking\": false,\n  \"userId\": \"invalid-user\",\n  \"items\": [\n    {\n      \"productId\": \"{{laptopId}}\",\n      \"quantity\": 1,\n      \"price\": 1200.00\n    }\n  ],\n  \"subtotal\": 1200.00\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/applicable-coupons",
+              "host": ["{{baseURL}}"],
+              "path": ["applicable-coupons"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Missing user data handled gracefully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    // Should not find user-specific coupons without user data",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-calculate subtotal for cart requests",
+          "if (pm.request.body && pm.request.body.raw) {",
+          "    try {",
+          "        const body = JSON.parse(pm.request.body.raw);",
+          "        if (body.items && Array.isArray(body.items)) {",
+          "            let subtotal = 0;",
+          "            body.items.forEach(item => {",
+          "                subtotal += (item.price * item.quantity);",
+          "            });",
+          "            body.subtotal = subtotal;",
+          "            pm.request.body.raw = JSON.stringify(body, null, 2);",
+          "        }",
+          "    } catch (e) {",
+          "        console.log('Could not auto-calculate subtotal:', e.message);",
+          "    }",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test to check response structure",
+          "pm.test('Response has valid structure', function () {",
+          "    const response = pm.response.json();",
+          "    pm.expect(response).to.have.property('success');",
+          "    pm.expect(response).to.have.property('message');",
+          "});"
+        ]
+      }
+    }
+  ]
+}

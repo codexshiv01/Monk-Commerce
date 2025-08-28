@@ -1,12 +1,26 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
+// Check for required environment variables
+const databaseUrl = process.env.NODE_ENV === 'test' 
+  ? process.env.DATABASE_TEST_URL
+  : process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  console.error('❌ Error: DATABASE_URL environment variable is not set!');
+  console.error('Available environment variables:');
+  console.error('NODE_ENV:', process.env.NODE_ENV);
+  console.error('DATABASE_URL:', process.env.DATABASE_URL ? 'SET' : 'NOT SET');
+  console.error('DATABASE_TEST_URL:', process.env.DATABASE_TEST_URL ? 'SET' : 'NOT SET');
+  
+  if (process.env.NODE_ENV === 'production') {
+    console.error('🔧 Fix: Set DATABASE_URL in your Render environment variables');
+    process.exit(1);
+  }
+}
+
 // Initialize Sequelize instance
-const sequelize = new Sequelize(
-  process.env.NODE_ENV === 'test' 
-    ? process.env.DATABASE_TEST_URL
-    : process.env.DATABASE_URL,
-  {
+const sequelize = new Sequelize(databaseUrl, {
     dialect: 'postgres',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
     dialectOptions: {

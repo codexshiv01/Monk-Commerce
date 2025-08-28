@@ -11,7 +11,10 @@
     "test:coverage": "jest --coverage",
     "seed": "node scripts/seedData.js",
     "seed:advanced": "node scripts/seedAdvancedCoupons.js",
-    "postman:advanced": "newman run Coupon_API_Collection_Advanced.postman_collection.json --environment postman_environment.json --reporters cli,json"
+    "postman:advanced": "newman run Coupon_API_Collection_Advanced.postman_collection.json --environment postman_environment.json --reporters cli,json",
+    "build": "echo 'No build step required'",
+    "deploy": "npm run seed",
+    "prepare-deploy": "node -e \"console.log('🚀 Run scripts/deploy.bat (Windows) or scripts/deploy.sh (Linux/Mac) to prepare for deployment')\""
   },
   "keywords": [
     "ecommerce",

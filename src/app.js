@@ -40,12 +40,22 @@ app.get('/', (req, res) => {
     message: 'Welcome to E-Commerce Coupon API',
     version: '1.0.0',
     endpoints: {
-      health: '/api/health',
+      health: '/health',
       coupons: '/api/coupons',
       applicableCoupons: '/api/applicable-coupons',
       applyCoupon: '/api/apply-coupon/:id'
     },
     documentation: 'Check README.md for detailed API documentation'
+  });
+});
+
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
